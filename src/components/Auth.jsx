@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, Mail, Lock, Eye, EyeOff, UserPlus, LogIn, Sparkles, DollarSign } from 'lucide-react';
+import { User, Mail, Lock, Eye, EyeOff, UserPlus, LogIn, Sparkles, IndianRupee } from 'lucide-react';
 
 const Auth = ({ onLogin }) => {
   const [isLogin, setIsLogin] = useState(true);
@@ -183,7 +183,7 @@ const Auth = ({ onLogin }) => {
           </div>
           <div className="bg-white/60 backdrop-blur-sm rounded-lg p-4 border border-gray-200/50">
             <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-2">
-              <DollarSign className="w-4 h-4 text-green-600" />
+              <IndianRupee className="w-4 h-4 text-green-600" />
             </div>
             <p className="text-xs text-gray-600 font-medium">Expense Tracking</p>
           </div>
