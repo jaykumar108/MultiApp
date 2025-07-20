@@ -1,5 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, MessageCircle, Bot, User, Settings, AlertCircle } from 'lucide-react';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 
 const ChatBot = () => {
   const [messages, setMessages] = useState([]);
@@ -89,53 +93,59 @@ const ChatBot = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto h-[500px] sm:h-[600px] bg-white/80 backdrop-blur-md rounded-2xl border border-gray-200/50 shadow-xl flex flex-col">
+    <div className="max-w-4xl mx-auto h-[500px] sm:h-[600px] bg-white rounded-2xl border border-gray-200 shadow-xl flex flex-col">
       {/* Header */}
-      <div className="p-4 sm:p-6 border-b border-gray-200/50 flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center shadow-lg">
-            <Bot className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
+      <Card className="border-0 shadow-none rounded-none">
+        <CardHeader className="p-4 sm:p-6 pb-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-black rounded-lg flex items-center justify-center shadow-lg">
+                <Bot className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
+              </div>
+              <div>
+                <CardTitle className="text-lg sm:text-2xl text-black">AI Chat Assistant</CardTitle>
+                <CardDescription className="text-xs sm:text-sm">Powered by Google Gemini</CardDescription>
+              </div>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setShowSettings(!showSettings)}
+              className="text-gray-400 hover:text-gray-600"
+            >
+              <Settings className="w-5 h-5" />
+            </Button>
           </div>
-          <div>
-            <h2 className="text-lg sm:text-2xl font-bold text-gray-900">AI Chat Assistant</h2>
-            <p className="text-xs sm:text-sm text-gray-500">Powered by Google Gemini</p>
-          </div>
-        </div>
-        <button
-          onClick={() => setShowSettings(!showSettings)}
-          className="p-1.5 sm:p-2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
-        >
-          <Settings className="w-5 h-5" />
-        </button>
-      </div>
+        </CardHeader>
+      </Card>
 
       {/* Settings Panel */}
       {showSettings && (
-        <div className="p-4 sm:p-6 border-b border-gray-200/50 bg-gray-50">
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Google Gemini API Key
-              </label>
-              <input
-                type="password"
-                value={apiKey}
-                onChange={(e) => setApiKey(e.target.value)}
-                placeholder="Enter your Gemini API key"
-                className="w-full px-4 py-2.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm sm:text-base"
-              />
+        <Card className="border-0 shadow-none rounded-none bg-gray-50">
+          <CardContent className="p-4 sm:p-6">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
+              <div className="flex-1">
+                <Label htmlFor="apiKey" className="block text-sm font-medium text-gray-700 mb-2">
+                  Google Gemini API Key
+                </Label>
+                <Input
+                  id="apiKey"
+                  type="password"
+                  value={apiKey}
+                  onChange={(e) => setApiKey(e.target.value)}
+                  placeholder="Enter your Gemini API key"
+                  className="text-sm sm:text-base"
+                />
+              </div>
+              <Button onClick={saveApiKey} className="px-4 py-2.5 sm:py-2">
+                Save
+              </Button>
             </div>
-            <button
-              onClick={saveApiKey}
-              className="px-4 py-2.5 sm:py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-all duration-200 transform hover:scale-105 shadow-lg text-sm sm:text-base"
-            >
-              Save
-            </button>
-          </div>
-          <p className="text-xs sm:text-sm text-gray-500 mt-2">
-            Get your API key from the <a href="https://makersuite.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:underline">Google AI Studio</a>
-          </p>
-        </div>
+            <p className="text-xs sm:text-sm text-gray-500 mt-2">
+              Get your API key from the <a href="https://makersuite.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-black hover:underline">Google AI Studio</a>
+            </p>
+          </CardContent>
+        </Card>
       )}
 
       {/* Messages Area */}
@@ -155,7 +165,7 @@ const ChatBot = () => {
               <div
                 className={`max-w-xs sm:max-w-sm lg:max-w-md xl:max-w-lg px-3 sm:px-4 py-2 sm:py-3 rounded-lg ${
                   message.sender === 'user'
-                    ? 'bg-blue-500 text-white'
+                    ? 'bg-black text-white'
                     : message.isError
                     ? 'bg-red-100 text-red-800 border border-red-200'
                     : 'bg-gray-100 text-gray-800'
@@ -174,7 +184,7 @@ const ChatBot = () => {
                   <div className="flex-1">
                     <p className="text-xs sm:text-sm whitespace-pre-wrap">{message.text}</p>
                     <p className={`text-xs mt-1 opacity-75 ${
-                      message.sender === 'user' ? 'text-blue-200' : 'text-gray-500'
+                      message.sender === 'user' ? 'text-gray-300' : 'text-gray-500'
                     }`}>
                       {message.timestamp.toLocaleTimeString()}
                     </p>
@@ -203,29 +213,31 @@ const ChatBot = () => {
       </div>
 
       {/* Message Input */}
-      <div className="p-4 sm:p-6 border-t border-gray-200/50">
-        <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
-          <textarea
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder="Type your message..."
-            className="flex-1 px-4 py-2.5 sm:py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none text-sm sm:text-base"
-            rows={1}
-          />
-          <button
-            onClick={sendMessage}
-            disabled={isLoading || !newMessage.trim()}
-            className="px-4 sm:px-6 py-2.5 sm:py-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center space-x-2 transform hover:scale-105 shadow-lg"
-          >
-            <Send className="w-5 h-5" />
-            <span className="text-sm sm:text-base">Send</span>
-          </button>
-        </div>
-        <p className="text-xs text-gray-500 mt-2 text-center sm:text-left">
-          Press Enter to send, Shift+Enter for new line
-        </p>
-      </div>
+      <Card className="border-0 shadow-none rounded-none">
+        <CardContent className="p-4 sm:p-6 pt-4">
+          <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
+            <textarea
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="Type your message..."
+              className="flex-1 px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black resize-none text-sm sm:text-base"
+              rows={1}
+            />
+            <Button
+              onClick={sendMessage}
+              disabled={isLoading || !newMessage.trim()}
+              className="px-4 sm:px-6 py-2.5 sm:py-3"
+            >
+              <Send className="w-5 h-5 mr-2" />
+              <span className="text-sm sm:text-base">Send</span>
+            </Button>
+          </div>
+          <p className="text-xs text-gray-500 mt-2 text-center sm:text-left">
+            Press Enter to send, Shift+Enter for new line
+          </p>
+        </CardContent>
+      </Card>
     </div>
   );
 };

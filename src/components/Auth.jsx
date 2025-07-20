@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
-import { User, Mail, Lock, Eye, EyeOff, UserPlus, LogIn, Sparkles, IndianRupee } from 'lucide-react';
+import { User, Mail, Lock, Eye, EyeOff, UserPlus, LogIn, Sparkles, IndianRupee, CheckCircle } from 'lucide-react';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 
 const Auth = ({ onLogin }) => {
   const [isLogin, setIsLogin] = useState(true);
@@ -54,144 +58,215 @@ const Auth = ({ onLogin }) => {
     }
   };
 
+  const features = [
+    {
+      icon: CheckCircle,
+      title: 'Todo Management',
+      description: 'Organize tasks efficiently'
+    },
+    {
+      icon: IndianRupee,
+      title: 'Expense Tracking',
+      description: 'Manage your budget'
+    },
+    {
+      icon: Sparkles,
+      title: 'AI Assistant',
+      description: 'Get smart help'
+    }
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        {/* Logo and Header */}
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-            <Sparkles className="w-8 h-8 text-white" />
-          </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">MultiApp</h1>
-          <p className="text-gray-600">Your all-in-one productivity suite</p>
-        </div>
-
-        {/* Auth Form */}
-        <div className="bg-white/80 backdrop-blur-lg rounded-2xl border border-gray-200/50 shadow-xl p-8">
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              {isLogin ? 'Welcome Back' : 'Create Account'}
-            </h2>
-            <p className="text-gray-600">
-              {isLogin ? 'Sign in to your account' : 'Sign up to get started'}
-            </p>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {!isLogin && (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-start lg:items-center justify-center p-4 overflow-y-auto">
+      <div className="w-full max-w-4xl grid grid-cols-1 lg:grid-cols-2 gap-8 lg:items-center py-8 lg:py-0">
+        {/* Left Side - Auth Form */}
+        <div className="space-y-6">
+          {/* Logo and Header */}
+          <div className="text-center lg:text-left space-y-4">
+            <div className="flex items-center justify-center lg:justify-start space-x-3">
+              <div className="w-12 h-12 bg-black rounded-xl flex items-center justify-center shadow-lg">
+                <Sparkles className="w-6 h-6 text-white" />
+              </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Full Name
-                </label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 ${
-                      errors.name ? 'border-red-500' : 'border-gray-200'
-                    }`}
-                    placeholder="Enter your full name"
-                  />
-                </div>
-                {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+                <h1 className="text-2xl font-bold text-black">MultiApp</h1>
+                <p className="text-sm text-gray-600">Productivity Suite</p>
               </div>
-            )}
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Email Address
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 ${
-                    errors.email ? 'border-red-500' : 'border-gray-200'
-                  }`}
-                  placeholder="Enter your email"
-                />
-              </div>
-              {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
             </div>
-
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Password
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  name="password"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 ${
-                    errors.password ? 'border-red-500' : 'border-gray-200'
-                  }`}
-                  placeholder="Enter your password"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
-              </div>
-              {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+              <h2 className="text-3xl font-bold text-black">
+                {isLogin ? 'Welcome back' : 'Create your account'}
+              </h2>
+              <p className="text-gray-600 mt-2">
+                {isLogin ? 'Sign in to access your dashboard' : 'Get started with your productivity journey'}
+              </p>
             </div>
-
-            <button
-              type="submit"
-              className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 rounded-lg font-medium hover:from-blue-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center justify-center space-x-2"
-            >
-              {isLogin ? <LogIn className="w-5 h-5" /> : <UserPlus className="w-5 h-5" />}
-              <span>{isLogin ? 'Sign In' : 'Sign Up'}</span>
-            </button>
-          </form>
-
-          <div className="mt-6 text-center">
-            <p className="text-gray-600">
-              {isLogin ? "Don't have an account?" : "Already have an account?"}
-              <button
-                onClick={() => {
-                  setIsLogin(!isLogin);
-                  setErrors({});
-                  setFormData({ name: '', email: '', password: '' });
-                }}
-                className="ml-2 text-blue-600 hover:text-blue-700 font-medium transition-colors duration-200"
-              >
-                {isLogin ? 'Sign Up' : 'Sign In'}
-              </button>
-            </p>
           </div>
+
+          {/* Auth Form */}
+          <Card className="shadow-lg border-0">
+            <CardContent className="p-6">
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {!isLogin && (
+                  <div className="space-y-2">
+                    <Label htmlFor="name" className="text-sm font-medium text-black">
+                      Full Name
+                    </Label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <Input
+                        id="name"
+                        type="text"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleInputChange}
+                        className={`pl-10 ${errors.name ? 'border-red-500 focus:border-red-500' : ''}`}
+                        placeholder="Enter your full name"
+                      />
+                    </div>
+                    {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
+                  </div>
+                )}
+
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-sm font-medium text-black">
+                    Email Address
+                  </Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <Input
+                      id="email"
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      className={`pl-10 ${errors.email ? 'border-red-500 focus:border-red-500' : ''}`}
+                      placeholder="Enter your email"
+                    />
+                  </div>
+                  {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="password" className="text-sm font-medium text-black">
+                    Password
+                  </Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <Input
+                      id="password"
+                      type={showPassword ? 'text' : 'password'}
+                      name="password"
+                      value={formData.password}
+                      onChange={handleInputChange}
+                      className={`pl-10 pr-10 ${errors.password ? 'border-red-500 focus:border-red-500' : ''}`}
+                      placeholder="Enter your password"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8 hover:bg-gray-100"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </Button>
+                  </div>
+                  {errors.password && <p className="text-sm text-red-500">{errors.password}</p>}
+                </div>
+
+                <Button type="submit" className="w-full h-12 text-base font-medium" size="lg">
+                  {isLogin ? <LogIn className="w-4 h-4 mr-2" /> : <UserPlus className="w-4 h-4 mr-2" />}
+                  {isLogin ? 'Sign In' : 'Create Account'}
+                </Button>
+              </form>
+
+              <div className="mt-6 text-center">
+                <p className="text-sm text-gray-600">
+                  {isLogin ? "Don't have an account?" : "Already have an account?"}
+                  <Button
+                    variant="link"
+                    onClick={() => {
+                      setIsLogin(!isLogin);
+                      setErrors({});
+                      setFormData({ name: '', email: '', password: '' });
+                    }}
+                    className="ml-1 p-0 h-auto text-black hover:text-gray-700 font-medium"
+                  >
+                    {isLogin ? 'Sign up' : 'Sign in'}
+                  </Button>
+                </p>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
-        {/* Features Preview */}
-        <div className="mt-8 grid grid-cols-3 gap-4 text-center">
-          <div className="bg-white/60 backdrop-blur-sm rounded-lg p-4 border border-gray-200/50">
-            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-2">
-              <User className="w-4 h-4 text-blue-600" />
-            </div>
-            <p className="text-xs text-gray-600 font-medium">Todo Management</p>
+        {/* Right Side - Features Preview */}
+        <div className="hidden lg:block space-y-6">
+          <div className="text-center space-y-4">
+            <h3 className="text-2xl font-bold text-black">Everything you need in one place</h3>
+            <p className="text-gray-600">Manage tasks, track expenses, and get AI assistance all in one powerful app.</p>
           </div>
-          <div className="bg-white/60 backdrop-blur-sm rounded-lg p-4 border border-gray-200/50">
-            <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-2">
-              <IndianRupee className="w-4 h-4 text-green-600" />
-            </div>
-            <p className="text-xs text-gray-600 font-medium">Expense Tracking</p>
+          
+          <div className="grid grid-cols-1 gap-4">
+            {features.map((feature, index) => {
+              const Icon = feature.icon;
+              return (
+                <Card key={index} className="border-0 shadow-md hover:shadow-lg transition-shadow duration-200">
+                  <CardContent className="p-4">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-10 h-10 bg-black rounded-lg flex items-center justify-center">
+                        <Icon className="w-5 h-5 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-black">{feature.title}</h4>
+                        <p className="text-sm text-gray-600">{feature.description}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
-          <div className="bg-white/60 backdrop-blur-sm rounded-lg p-4 border border-gray-200/50">
-            <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-2">
-              <Sparkles className="w-4 h-4 text-purple-600" />
-            </div>
-            <p className="text-xs text-gray-600 font-medium">AI Assistant</p>
+
+          {/* Stats */}
+          <Card className="border-0 shadow-md bg-black text-white">
+            <CardContent className="p-6">
+              <div className="grid grid-cols-3 gap-4 text-center">
+                <div>
+                  <div className="text-2xl font-bold">1K+</div>
+                  <div className="text-sm text-gray-300">Active Users</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold">5K+</div>
+                  <div className="text-sm text-gray-300">Tasks Completed</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold">99%</div>
+                  <div className="text-sm text-gray-300">Satisfaction</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Mobile Features */}
+        <div className="lg:hidden space-y-6">
+          <div className="text-center space-y-4">
+            <h3 className="text-xl font-bold text-black">Key Features</h3>
+            <p className="text-gray-600">Everything you need to stay productive</p>
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            {features.map((feature, index) => {
+              const Icon = feature.icon;
+              return (
+                <Card key={index} className="text-center p-4 border-0 shadow-sm">
+                  <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <Icon className="w-4 h-4 text-white" />
+                  </div>
+                  <p className="text-xs text-gray-600 font-medium">{feature.title}</p>
+                </Card>
+              );
+            })}
           </div>
         </div>
       </div>

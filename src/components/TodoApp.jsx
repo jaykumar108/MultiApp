@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Check, X, Edit3, Trash2, Calendar, Flag } from 'lucide-react';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 
 const TodoApp = () => {
   const [todos, setTodos] = useState([]);
@@ -76,66 +79,64 @@ const TodoApp = () => {
 
   return (
     <div className="max-w-4xl mx-auto px-2 sm:px-0">
-      <div className="bg-white/80 backdrop-blur-md rounded-2xl border border-gray-200/50 shadow-xl">
+      <Card>
         {/* Header */}
-        <div className="p-4 sm:p-6 border-b border-gray-200/50">
+        <CardHeader className="p-4 sm:p-6 pb-4">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Todo App</h2>
-              <p className="text-sm sm:text-base text-gray-600 mt-1">
+              <CardTitle className="text-xl sm:text-2xl text-black">Todo App</CardTitle>
+              <CardDescription className="text-sm sm:text-base mt-1">
                 {totalCount} total, {completedCount} completed
-              </p>
+              </CardDescription>
             </div>
             <div className="flex items-center space-x-2 hidden sm:flex">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-black rounded-lg flex items-center justify-center shadow-lg">
                 <Check className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
             </div>
           </div>
-        </div>
+        </CardHeader>
 
         {/* Add Todo Form */}
-        <div className="p-4 sm:p-6 border-b border-gray-200/50">
+        <CardContent className="p-4 sm:p-6 pt-0">
           <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
-            <input
+            <Input
               type="text"
               value={newTodo}
               onChange={(e) => setNewTodo(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && addTodo()}
               placeholder="Add a new task..."
-              className="flex-1 px-4 py-2.5 sm:py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
+              className="flex-1"
             />
-            <button
-              onClick={addTodo}
-              className="px-4 sm:px-6 py-2.5 sm:py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all duration-200 flex items-center justify-center space-x-2 transform hover:scale-105 shadow-lg"
-            >
-              <Plus className="w-5 h-5" />
+            <Button onClick={addTodo}>
+              <Plus className="w-5 h-5 mr-2" />
               <span className="text-sm sm:text-base">Add</span>
-            </button>
+            </Button>
           </div>
-        </div>
+        </CardContent>
 
         {/* Filter Tabs */}
-        <div className="p-4 sm:p-6 border-b border-gray-200/50">
+        <CardContent className="p-4 sm:p-6 pt-0">
           <div className="flex space-x-1 bg-gray-100 rounded-lg p-1">
             {['all', 'active', 'completed'].map((filterType) => (
-              <button
+              <Button
                 key={filterType}
                 onClick={() => setFilter(filterType)}
-                className={`flex-1 py-2 px-2 sm:px-4 rounded-md text-xs sm:text-sm font-medium transition-all duration-200 ${
+                variant={filter === filterType ? "default" : "ghost"}
+                className={`flex-1 py-2 px-2 sm:px-4 text-xs sm:text-sm font-medium ${
                   filter === filterType
-                    ? 'bg-white text-blue-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-black text-white'
+                    : 'text-gray-600 hover:text-black'
                 }`}
               >
                 {filterType.charAt(0).toUpperCase() + filterType.slice(1)}
-              </button>
+              </Button>
             ))}
           </div>
-        </div>
+        </CardContent>
 
         {/* Todo List */}
-        <div className="p-4 sm:p-6">
+        <CardContent className="p-4 sm:p-6 pt-0">
           {filteredTodos.length === 0 ? (
             <div className="text-center py-12">
               <Check className="w-12 h-12 sm:w-16 sm:h-16 text-gray-300 mx-auto mb-4" />
@@ -157,46 +158,42 @@ const TodoApp = () => {
                       : 'bg-white border-gray-200 hover:shadow-md transform hover:scale-[1.02]'
                   }`}
                 >
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={() => toggleTodo(todo.id)}
-                    className={`flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 transition-all duration-200 mt-1 sm:mt-0 ${
+                    className={`flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 transition-all duration-200 mt-1 sm:mt-0 p-0 ${
                       todo.completed
-                        ? 'bg-green-500 border-green-500'
-                        : 'border-gray-300 hover:border-green-500'
+                        ? 'bg-black border-black hover:bg-gray-800'
+                        : 'border-gray-300 hover:border-black'
                     }`}
                   >
                     {todo.completed && <Check className="w-3 h-3 sm:w-4 sm:h-4 text-white m-auto" />}
-                  </button>
+                  </Button>
 
                   <div className="flex-1">
                     {editingId === todo.id ? (
                       <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
-                        <input
+                        <Input
                           type="text"
                           value={editText}
                           onChange={(e) => setEditText(e.target.value)}
                           onKeyPress={(e) => e.key === 'Enter' && saveEdit()}
-                          className="flex-1 px-3 py-1.5 sm:py-1 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
+                          className="flex-1"
                           autoFocus
                         />
                         <div className="flex space-x-2">
-                          <button
-                            onClick={saveEdit}
-                            className="px-3 py-1.5 sm:py-1 bg-green-500 text-white rounded hover:bg-green-600 transition-colors duration-200"
-                          >
+                          <Button onClick={saveEdit} size="sm" className="bg-green-600 hover:bg-green-700">
                             <Check className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={cancelEdit}
-                            className="px-3 py-1.5 sm:py-1 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors duration-200"
-                          >
+                          </Button>
+                          <Button onClick={cancelEdit} size="sm" variant="outline">
                             <X className="w-4 h-4" />
-                          </button>
+                          </Button>
                         </div>
                       </div>
                     ) : (
                       <div>
-                        <p className={`text-sm sm:text-base ${todo.completed ? 'line-through text-gray-500' : 'text-gray-900'}`}>
+                        <p className={`text-sm sm:text-base ${todo.completed ? 'line-through text-gray-500' : 'text-black'}`}>
                           {todo.text}
                         </p>
                         <p className="text-xs sm:text-sm text-gray-400 mt-1 flex items-center">
@@ -209,26 +206,30 @@ const TodoApp = () => {
 
                   {editingId !== todo.id && (
                     <div className="flex space-x-1 mt-1 sm:mt-0">
-                      <button
+                      <Button
+                        variant="ghost"
+                        size="icon"
                         onClick={() => startEditing(todo.id, todo.text)}
-                        className="p-1.5 sm:p-2 text-gray-400 hover:text-blue-600 transition-colors duration-200"
+                        className="text-gray-400 hover:text-blue-600"
                       >
                         <Edit3 className="w-3 h-3 sm:w-4 sm:h-4" />
-                      </button>
-                      <button
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
                         onClick={() => deleteTodo(todo.id)}
-                        className="p-1.5 sm:p-2 text-gray-400 hover:text-red-600 transition-colors duration-200"
+                        className="text-gray-400 hover:text-red-600"
                       >
                         <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
-                      </button>
+                      </Button>
                     </div>
                   )}
                 </div>
               ))}
             </div>
           )}
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
