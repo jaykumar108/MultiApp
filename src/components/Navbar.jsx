@@ -1,9 +1,10 @@
 import React from 'react';
-import { User, LogOut, Menu, X } from 'lucide-react';
+import { User, Menu, X } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
+import LogoutButton from './LogoutButton';
 
-function Navbar({ tabs, activeTab, setActiveTab, user, handleLogout }) {
+const Navbar = ({ tabs, activeTab, setActiveTab, user, handleLogout }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
 
   return (
@@ -51,15 +52,7 @@ function Navbar({ tabs, activeTab, setActiveTab, user, handleLogout }) {
                 <User className="w-4 h-4 text-gray-600" />
                 <span className="text-sm font-medium text-black">{user.name}</span>
               </div>
-              <Button
-                onClick={handleLogout}
-                variant="ghost"
-                size="icon"
-                className="text-gray-600 hover:text-red-600 hover:bg-red-50"
-                title="Logout"
-              >
-                <LogOut className="w-5 h-5" />
-              </Button>
+              <LogoutButton onLogout={handleLogout} className="text-gray-600 hover:text-red-600 hover:bg-red-50" />
               
               {/* Mobile Menu Button */}
               <Button
