@@ -1,5 +1,5 @@
 // Auth Service - Handles all authentication API calls
-const API_BASE_URL = '/api/auth';
+const API_BASE_URL = 'https://multi-app-backend.vercel.app/api/auth';
 
 // Helper function to handle API responses
 const handleResponse = async (response) => {
