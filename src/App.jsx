@@ -22,7 +22,7 @@ function App() {
       try {
         setIsLoading(true);
         
-        // First check if token exists
+        // check if token exists
         const token = localStorage.getItem('authToken');
         console.log('Token found:', !!token);
         

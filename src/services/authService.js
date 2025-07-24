@@ -12,12 +12,10 @@ const handleResponse = async (response) => {
   return data;
 };
 
-// Helper function to get auth headers
 const getAuthHeaders = () => {
   return {
     'Content-Type': 'application/json',
-    // For cookie-based auth, we don't need to send token in headers
-    // The browser will automatically send cookies
+   
   };
 };
 
@@ -35,8 +33,6 @@ export const registerUser = async (userData) => {
 
   const data = await handleResponse(response);
   
-  // Store a flag in localStorage to indicate user is authenticated
-  // The actual token is stored in HTTP-only cookies by the backend
   localStorage.setItem('authToken', 'authenticated');
   
   return data;
@@ -53,9 +49,7 @@ export const loginWithPassword = async (credentials) => {
   });
 
   const data = await handleResponse(response);
-  
-  // Store a flag in localStorage to indicate user is authenticated
-  // The actual token is stored in HTTP-only cookies by the backend
+
   localStorage.setItem('authToken', 'authenticated');
   
   return data;
@@ -85,14 +79,10 @@ export const verifyOTP = async (email, otp) => {
 
   const data = await handleResponse(response);
   
-  // Store a flag in localStorage to indicate user is authenticated
-  // The actual token is stored in HTTP-only cookies by the backend
   localStorage.setItem('authToken', 'authenticated');
   
   return data;
 };
-
-// Protected Routes (Authentication Required)
 
 export const logout = async () => {
   try {
@@ -106,13 +96,10 @@ export const logout = async () => {
   } catch (error) {
     console.error('Logout error:', error);
   } finally {
-    // Always clear auth token on logout
+    //  clear auth token on logout
     localStorage.removeItem('authToken');
-    // Don't store user data in localStorage for security
   }
 };
-
-// Utility Functions
 
 export const getStoredToken = () => {
   return localStorage.getItem('authToken');
@@ -129,30 +116,8 @@ export const validateToken = async () => {
       return null;
     }
 
-    // TODO: Replace with actual API call to validate token
-    // const response = await fetch(`${API_BASE_URL}/validate-token`, {
-    //   method: 'GET',
-    //   headers: getAuthHeaders(),
-    //   credentials: 'include',
-    // });
-    // const data = await handleResponse(response);
-    // return data.user;
-
-    // For now, return a mock user if auth flag exists
-    // Simulate a small delay to make it feel more realistic
     await new Promise(resolve => setTimeout(resolve, 300));
-    
-    // Check if auth flag exists and return user data
-    if (authFlag === 'authenticated') {
-      return {
-        name: 'Jay Kumar Sharma',
-        email: 'jaykumar732092@gmail.com',
-        city: 'Darbhanga',
-        mobile: '8736587634',
-        role: 'user',
-        isAuthenticated: true
-      };
-    }
+  
     
     return null;
   } catch (error) {
@@ -165,38 +130,6 @@ export const validateToken = async () => {
 
 export const clearAuthData = () => {
   localStorage.removeItem('authToken');
-  // Don't store user data in localStorage for security
+  
 };
 
-// Future Protected Routes (Examples)
-// Uncomment and implement as needed
-
-/*
-export const getProfile = async () => {
-  const response = await fetch(`${API_BASE_URL}/profile`, {
-    method: 'GET',
-    headers: getAuthHeaders(),
-  });
-
-  return await handleResponse(response);
-};
-
-export const updateProfile = async (profileData) => {
-  const response = await fetch(`${API_BASE_URL}/profile`, {
-    method: 'PUT',
-    headers: getAuthHeaders(),
-    body: JSON.stringify(profileData),
-  });
-
-  return await handleResponse(response);
-};
-
-export const getAllUsers = async () => {
-  const response = await fetch(`${API_BASE_URL}/admin/users`, {
-    method: 'GET',
-    headers: getAuthHeaders(),
-  });
-
-  return await handleResponse(response);
-};
-*/ 
