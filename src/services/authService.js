@@ -1,5 +1,6 @@
-// Auth Service - Handles all authentication API calls
+
 const API_BASE_URL = 'https://multi-app-backend.vercel.app/api/auth';
+// const API_BASE_URL = 'http://localhost:5000/api/auth';
 
 // Helper function to handle API responses
 const handleResponse = async (response) => {
@@ -33,8 +34,6 @@ export const registerUser = async (userData) => {
 
   const data = await handleResponse(response);
   
-  localStorage.setItem('authToken', 'authenticated');
-  
   return data;
 };
 
@@ -49,8 +48,6 @@ export const loginWithPassword = async (credentials) => {
   });
 
   const data = await handleResponse(response);
-
-  localStorage.setItem('authToken', 'authenticated');
   
   return data;
 };
@@ -79,8 +76,6 @@ export const verifyOTP = async (email, otp) => {
 
   const data = await handleResponse(response);
   
-  localStorage.setItem('authToken', 'authenticated');
-  
   return data;
 };
 
@@ -95,41 +90,6 @@ export const logout = async () => {
     await handleResponse(response);
   } catch (error) {
     console.error('Logout error:', error);
-  } finally {
-    //  clear auth token on logout
-    localStorage.removeItem('authToken');
   }
-};
-
-export const getStoredToken = () => {
-  return localStorage.getItem('authToken');
-};
-
-export const isAuthenticated = () => {  
-  return !!getStoredToken();
-};
-
-export const validateToken = async () => {
-  try {
-    const authFlag = getStoredToken();
-    if (!authFlag) {
-      return null;
-    }
-
-    await new Promise(resolve => setTimeout(resolve, 300));
-  
-    
-    return null;
-  } catch (error) {
-    console.error('Token validation error:', error);
-    // If token is invalid, clear it
-    clearAuthData();
-    return null;
-  }
-};
-
-export const clearAuthData = () => {
-  localStorage.removeItem('authToken');
-  
 };
 
