@@ -1,6 +1,6 @@
 
-// const API_BASE_URL = 'https://multi-app-backend.vercel.app/api/auth';
-const API_BASE_URL = 'http://localhost:5000/api/auth';
+const API_BASE_URL = 'https://multi-app-backend.vercel.app/api/auth';
+// const API_BASE_URL = 'http://localhost:5000/api/auth';
 
 // Cookie management functions
 const setCookie = (name, value, days = 7) => {

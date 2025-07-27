@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Check, X, Edit3, Trash2, Calendar, Flag, Filter, Search, BarChart3, MoreHorizontal, ChevronLeft, ChevronRight, Settings, Download, Upload } from 'lucide-react';
+import { Plus, Check, X, Edit3, Trash2, Calendar, Flag, Filter, Search, BarChart3, MoreHorizontal, ChevronLeft, ChevronRight, Settings, Download, Upload, Eye } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
@@ -16,6 +16,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Separator } from '../ui/separator';
 import { Calendar as CalendarComponent } from '../ui/calendar';
 import { createTodo, getTodos, updateTodo, deleteTodo, toggleTodoStatus, getTodoStats } from '../../services/todoService';
+import ViewModal from './ViewModal';
 import toast from 'react-hot-toast';
 
 const TodoApp = () => {
