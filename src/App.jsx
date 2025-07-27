@@ -9,7 +9,7 @@ import Auth from './components/Auth';
 import Footer from './components/Footer';
 import Navbar from './components/Navbar';
 import { Toaster } from 'react-hot-toast';
-import { validateToken } from './services/authService';
+import { validateToken, logout, checkAuthStatus, storeUserData, clearUserData } from './services/authService';
 
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -22,24 +22,55 @@ function App() {
       try {
         setIsLoading(true);
         
-        // check if token exists
-        const token = localStorage.getItem('authToken');
-        console.log('Token found:', !!token);
+        // First, check if we have stored user data
+        const storedUserData = checkAuthStatus();
+        console.log('Stored user data found:', !!storedUserData);
         
-        if (!token) {
-          setIsLoading(false);
-          return;
-        }
-        
-        const userData = await validateToken();
-        console.log('User data:', userData);
-        
-        if (userData) {
-          setUser(userData);
+        if (storedUserData) {
+          // Set user immediately from stored data for faster loading
+          const completeUserData = {
+            name: storedUserData.name,
+            email: storedUserData.email,
+            city: storedUserData.city,
+            mobile: storedUserData.mobile,
+            role: storedUserData.role,
+            userId: storedUserData.id,
+            isAuthenticated: true
+          };
+          setUser(completeUserData);
+          
+          // Then validate token in background
+          try {
+            const validatedUserData = await validateToken();
+            if (validatedUserData) {
+              // Update with fresh data from server
+              const updatedUserData = {
+                name: validatedUserData.name,
+                email: validatedUserData.email,
+                city: validatedUserData.city,
+                mobile: validatedUserData.mobile,
+                role: validatedUserData.role,
+                userId: validatedUserData.id,
+                isAuthenticated: true
+              };
+              setUser(updatedUserData);
+            } else {
+              // Token validation failed, clear everything
+              clearUserData();
+              setUser(null);
+            }
+          } catch (error) {
+            console.error('Token validation failed:', error);
+            clearUserData();
+            setUser(null);
+          }
+        } else {
+          // No stored data, user is not authenticated
+          console.log('No authentication data found');
         }
       } catch (error) {
         console.error('Authentication check failed:', error);
-        // If validation fails, user will stay logged out
+        clearUserData();
       } finally {
         setIsLoading(false);
       }
@@ -56,20 +87,29 @@ function App() {
       city: userData.city,
       mobile: userData.mobile,
       role: userData.role,
-      userId: userData.userId,
+      userId: userData.id || userData.userId,
       isAuthenticated: true
     };
     setUser(completeUserData);
-    // User details are not stored in localStorage for security
+    // Store user data for persistence
+    storeUserData(completeUserData);
   };
 
-  const handleLogout = () => {
-    setUser(null);
-    // Only remove auth token, keep other app data
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('todos');
-    localStorage.removeItem('expenses');
-    localStorage.removeItem('gemini_api_key');
+  const handleLogout = async () => {
+    try {
+      // Call logout API to clear server-side session
+      await logout();
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      setUser(null);
+      // Clear all auth-related data
+      clearUserData();
+      // Keep other app data in localStorage
+      localStorage.removeItem('todos');
+      localStorage.removeItem('expenses');
+      localStorage.removeItem('gemini_api_key');
+    }
   };
 
   if (isLoading) {

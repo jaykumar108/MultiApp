@@ -4,7 +4,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { registerUser, loginWithPassword, sendOTP, verifyOTP } from '../services/authService';
+import { registerUser, loginWithPassword, sendOTP, verifyOTP, storeUserData } from '../services/authService';
 import toast, { Toaster } from 'react-hot-toast';
 
 const Auth = ({ onLogin }) => {
@@ -155,11 +155,13 @@ const Auth = ({ onLogin }) => {
         email: data.user.email,
         city: data.user.city,
         mobile: formData.mobile,
-        userId: data.userId,
+        userId: data.user.id,
         role: data.user.role,
         joinDate: new Date().toISOString()
       };
       
+      // Store user data for persistence
+      storeUserData(userData);
       onLogin(userData);
       
     } catch (error) {
@@ -194,11 +196,13 @@ const Auth = ({ onLogin }) => {
         email: data.user.email,
         city: data.user.city,
         mobile: data.user.mobile,
-        userId: data.userId,
+        userId: data.user.id,
         role: data.user.role,
         joinDate: new Date().toISOString()
       };
       
+      // Store user data for persistence
+      storeUserData(userData);
       onLogin(userData);
       
     } catch (error) {
@@ -323,11 +327,13 @@ const Auth = ({ onLogin }) => {
         email: data.user.email,
         city: data.user.city,
         mobile: data.user.mobile,
-        userId: data.userId,
+        userId: data.user.id,
         role: data.user.role,
         joinDate: new Date().toISOString()
       };
       
+      // Store user data for persistence
+      storeUserData(userData);
       onLogin(userData);
       
     } catch (error) {
