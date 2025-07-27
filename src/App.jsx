@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Home, CheckSquare, IndianRupee, MessageCircle, User, LogOut, Settings } from 'lucide-react';
-import TodoApp from './components/TodoApp';
+import TodoApp from './components/todo/TodoApp';
 import ExpenseTracker from './components/ExpenseTracker';
 import ChatBot from './components/ChatBot';
 import Dashboard from './components/Dashboard';
