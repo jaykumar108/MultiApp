@@ -28,6 +28,10 @@ const TodoApp = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showCalendar, setShowCalendar] = useState(false);
   
+  // ViewModal states
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [selectedTodo, setSelectedTodo] = useState(null);
+  
   // Form states
   const [formData, setFormData] = useState({
     title: '',
@@ -126,6 +130,16 @@ const TodoApp = () => {
       console.error('Error toggling todo:', error);
       toast.error('Failed to update todo status');
     }
+  };
+
+  const handleViewTodo = (todo) => {
+    setSelectedTodo(todo);
+    setViewModalOpen(true);
+  };
+
+  const handleCloseViewModal = () => {
+    setViewModalOpen(false);
+    setSelectedTodo(null);
   };
 
   const handleDelete = async (id) => {
