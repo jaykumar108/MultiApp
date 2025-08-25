@@ -430,7 +430,7 @@ const Auth = ({ onLogin }) => {
                   <>
                     <div className="space-y-2">
                       <Label htmlFor="name" className="text-sm font-medium text-black">
-                        Full Name *
+                        Full Name <span className="text-red-500">*</span>
                       </Label>
                       <div className="relative">
                         <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -449,7 +449,7 @@ const Auth = ({ onLogin }) => {
 
                     <div className="space-y-2">
                       <Label htmlFor="city" className="text-sm font-medium text-black">
-                        City *
+                        City <span className="text-red-500">*</span>
                       </Label>
                       <div className="relative">
                         <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -492,7 +492,7 @@ const Auth = ({ onLogin }) => {
                 {(!isLogin || (isLogin && !isOtpLogin)) && (
                   <div className="space-y-2">
                     <Label htmlFor="email" className="text-sm font-medium text-black">
-                      Email Address *
+                      Email Address <span className="text-red-500">*</span>
                     </Label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -514,7 +514,7 @@ const Auth = ({ onLogin }) => {
                 {isLogin && isOtpLogin && !otpSent && (
                   <div className="space-y-2">
                     <Label htmlFor="email" className="text-sm font-medium text-black">
-                      Email Address *
+                      Email Address <span className="text-red-500">*</span>
                     </Label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -536,7 +536,7 @@ const Auth = ({ onLogin }) => {
                 {isLogin && isOtpLogin && otpSent && (
                   <div className="space-y-2">
                     <Label className="text-sm font-medium text-black">
-                      Enter OTP *
+                      Enter OTP <span className="text-red-500">*</span>
                     </Label>
                     <div className="flex space-x-2 justify-center">
                       {otp.map((digit, index) => (
@@ -572,7 +572,7 @@ const Auth = ({ onLogin }) => {
                   <>
                     <div className="space-y-2">
                       <Label htmlFor="password" className="text-sm font-medium text-black">
-                        Password *
+                        Password <span className="text-red-500">*</span>
                       </Label>
                       <div className="relative">
                         <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -601,7 +601,7 @@ const Auth = ({ onLogin }) => {
                     {!isLogin && (
                       <div className="space-y-2">
                         <Label htmlFor="confirmPassword" className="text-sm font-medium text-black">
-                          Confirm Password *
+                          Confirm Password <span className="text-red-500">*</span>
                         </Label>
                         <div className="relative">
                           <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
