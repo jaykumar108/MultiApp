@@ -632,7 +632,7 @@ const Auth = ({ onLogin }) => {
 
                 <Button 
                   type="submit" 
-                  className="w-full h-12 text-base font-medium" 
+                  className="w-full h-12 text-base font-medium bg-black hover:bg-gray-800" 
                   size="lg"
                   disabled={isLoading}
                 >
