@@ -1,9 +1,9 @@
 
 const API_BASE_URL = 'https://multi-app-backend.vercel.app/api/auth';
-// const API_BASE_URL = 'http://localhost:5000/api/auth';
+// const API_BASE_URL='http://localhost:5000/api/auth';
 
-// Cookie management functions
-const setCookie = (name, value, days = 7) => {
+// Cookie management functions for user data only (not JWT tokens)
+const setCookie = (name, value, days = 7) => {  
   const expires = new Date();
   expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
   document.cookie = `${name}=${encodeURIComponent(JSON.stringify(value))};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
@@ -35,7 +35,10 @@ const deleteCookie = (name) => {
 
 // Helper function to handle API responses
 const handleResponse = async (response) => {
+  console.log('API response status:', response.status);
+  
   const data = await response.json();
+  console.log('API response data:', data);
   
   if (!response.ok) {
     throw new Error(data.message || 'API request failed');
@@ -73,7 +76,7 @@ export const getUserData = () => {
 export const clearUserData = () => {
   try {
     deleteCookie('userData');
-    deleteCookie('authToken');
+    // Note: authToken is managed by the server as HTTP-only cookie
   } catch (error) {
     console.error('Error clearing user data:', error);
   }
@@ -107,13 +110,9 @@ export const loginWithPassword = async (credentials) => {
   });
 
   const data = await handleResponse(response);
-  // If token is returned in response body, save it in cookie
-  if (data.token) {
-    setCookie('authToken', data.token, 7);
-    // Store user data in cookie for persistence
-    if (data.user) {
-      storeUserData(data.user);
-    }
+  // Store user data in cookie for persistence
+  if (data.user) {
+    storeUserData(data.user);
   }
   return data;
 };
@@ -141,13 +140,9 @@ export const verifyOTP = async (email, otp) => {
   });
 
   const data = await handleResponse(response);
-  // If token is returned in response body, save it in cookie
-  if (data.token) {
-    setCookie('authToken', data.token, 7);
-    // Store user data in cookie for persistence
-    if (data.user) {
-      storeUserData(data.user);
-    }
+  // Store user data in cookie for persistence
+  if (data.user) {
+    storeUserData(data.user);
   }
   return data;
 };
@@ -170,20 +165,25 @@ export const logout = async () => {
 };
 
 export const validateToken = async () => {
-  const token = getCookie('authToken');
-  if (!token) return null;
-
   try {
+    console.log('Validating token...');
     const response = await fetch(`${API_BASE_URL}/validate-token`, {
       method: 'GET',
-      headers: {
-        ...getAuthHeaders(),
-        'Authorization': `Bearer ${token}`,
-      },
-      credentials: 'include',
+      headers: getAuthHeaders(),
+      credentials: 'include', // Include HTTP-only cookies
     });
 
-    const data = await handleResponse(response);
+    console.log('Token validation response status:', response.status);
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('Token validation failed with status:', response.status, errorData);
+      throw new Error(`HTTP ${response.status}: ${errorData.message || 'Token validation failed'}`);
+    }
+
+    const data = await response.json();
+    console.log('Token validation successful:', data);
+    
     // Update stored user data with fresh data from server
     if (data.user) {
       storeUserData(data.user);
@@ -191,7 +191,7 @@ export const validateToken = async () => {
     return data.user;
   } catch (error) {
     console.error('Token validation failed:', error);
-    // If token validation fails, remove the invalid token and user data
+    // If token validation fails, clear user data
     clearUserData();
     return null;
   }
@@ -199,16 +199,10 @@ export const validateToken = async () => {
 
 // Function to check if user is authenticated (for initial load)
 export const checkAuthStatus = () => {
-  const token = getCookie('authToken');
   const userData = getUserData();
   
-  if (token && userData) {
+  if (userData) {
     return userData;
-  }
-  
-  // If token exists but no user data, clear token
-  if (token && !userData) {
-    clearUserData();
   }
   
   return null;

@@ -54,15 +54,21 @@ function App() {
                 isAuthenticated: true
               };
               setUser(updatedUserData);
+              console.log('Token validation successful');
             } else {
               // Token validation failed, clear everything
+              console.log('Token validation failed - clearing user data');
               clearUserData();
               setUser(null);
             }
           } catch (error) {
-            console.error('Token validation failed:', error);
-            clearUserData();
-            setUser(null);
+            console.error('Token validation error:', error);
+            // Only clear user data if it's an authentication error
+            if (error.message && error.message.includes('401')) {
+              console.log('Authentication error - clearing user data');
+              clearUserData();
+              setUser(null);
+            }
           }
         } else {
           // No stored data, user is not authenticated
