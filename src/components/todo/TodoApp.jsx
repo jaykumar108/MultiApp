@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Check, X, Edit3, Trash2, Calendar, Flag, Filter, Search, BarChart3, MoreHorizontal, ChevronLeft, ChevronRight, Settings, Download, Upload, Eye } from 'lucide-react';
+import { Plus, Check, X, Edit3, Trash2, Calendar, Flag, BarChart3, MoreHorizontal } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
@@ -13,10 +13,7 @@ import { Progress } from '../ui/progress';
 import { Skeleton } from '../ui/skeleton';
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '../ui/pagination';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '../ui/dropdown-menu';
-import { Separator } from '../ui/separator';
-import { Calendar as CalendarComponent } from '../ui/calendar';
 import { createTodo, getTodos, updateTodo, deleteTodo, toggleTodoStatus, getTodoStats } from '../../services/todoService';
-import ViewModal from './ViewModal';
 import toast from 'react-hot-toast';
 
 const TodoApp = () => {
@@ -25,36 +22,23 @@ const TodoApp = () => {
   const [stats, setStats] = useState({});
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [showCalendar, setShowCalendar] = useState(false);
-  
-  // ViewModal states
-  const [viewModalOpen, setViewModalOpen] = useState(false);
-  const [selectedTodo, setSelectedTodo] = useState(null);
-  
+
   // Form states
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     category: 'other',
     priority: 'medium',
-    dueDate: '' 
+    dueDate: ''
   });
-  
-  // Filter states
+
+  // Pagination states
   const [filters, setFilters] = useState({
     page: 1,
     limit: 10,
-    status: '',
-    category: '',
-    priority: '',
-    search: '',
     sortBy: 'createdAt',
     sortOrder: 'desc'
   });
-  
-  const [showFilters, setShowFilters] = useState(false);
-  const [viewMode, setViewMode] = useState('table'); // table, card, calendar
 
   // Load todos on component mount
   useEffect(() => {
@@ -86,7 +70,7 @@ const TodoApp = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!formData.title.trim()) {
       toast.error('Title is required');
       return;
@@ -100,7 +84,7 @@ const TodoApp = () => {
 
       await createTodo(todoData);
       toast.success('Todo created successfully');
-      
+
       // Reset form
       setFormData({
         title: '',
@@ -110,7 +94,7 @@ const TodoApp = () => {
         dueDate: ''
       });
       setDialogOpen(false);
-      
+
       // Reload todos
       loadTodos();
       loadStats();
@@ -132,19 +116,9 @@ const TodoApp = () => {
     }
   };
 
-  const handleViewTodo = (todo) => {
-    setSelectedTodo(todo);
-    setViewModalOpen(true);
-  };
-
-  const handleCloseViewModal = () => {
-    setViewModalOpen(false);
-    setSelectedTodo(null);
-  };
-
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this todo?')) return;
-    
+
     try {
       await deleteTodo(id);
       toast.success('Todo deleted successfully');
@@ -166,14 +140,6 @@ const TodoApp = () => {
       console.error('Error updating todo:', error);
       toast.error('Failed to update todo');
     }
-  };
-
-  const updateFilter = (key, value) => {
-    setFilters(prev => ({
-      ...prev,
-      [key]: value,
-      page: 1 // Reset to first page when filters change
-    }));
   };
 
   const getPriorityColor = (priority) => {
@@ -201,60 +167,29 @@ const TodoApp = () => {
   };
 
   const handlePageChange = (page) => {
-    updateFilter('page', page);
+    setFilters(prev => ({ ...prev, page }));
   };
 
   const totalPages = Math.ceil((stats.total || 0) / filters.limit);
+  const startIndex = (filters.page - 1) * filters.limit;
 
   return (
-    <div className="max-w-7xl mx-auto px-2 sm:px-0">
+    <div className="w-full">
       <Card>
         {/* Header */}
         <CardHeader className="p-4 sm:p-6 pb-4">
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-xl sm:text-2xl text-black">Todo App</CardTitle>
+              <CardTitle className="text-xl sm:text-2xl text-indigo-600">Todo App</CardTitle>
               <CardDescription className="text-sm sm:text-base mt-1">
                 {stats.total || 0} total, {stats.completed || 0} completed
               </CardDescription>
             </div>
             <div className="flex items-center space-x-2">
-              {/* View Mode Dropdown */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    <BarChart3 className="w-4 h-4 mr-2" />
-                    {viewMode === 'table' ? 'Table' : viewMode === 'card' ? 'Cards' : 'Calendar'}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>View Mode</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => setViewMode('table')}>
-                    Table View
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setViewMode('card')}>
-                    Card View
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setViewMode('calendar')}>
-                    Calendar View
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              <Button
-                variant="outline"
-                onClick={() => setShowFilters(!showFilters)}
-                className="hidden sm:flex"
-              >
-                <Filter className="w-4 h-4 mr-2" />
-                Filters
-              </Button>
-              
               {/* Add Todo Dialog */}
               <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button className='bg-black text-white hover:bg-black/80'>
+                  <Button className='bg-indigo-600 text-white hover:bg-indigo-700 rounded-3xl'>
                     <Plus className="w-5 h-5 mr-2" />
                     Add Todo
                   </Button>
@@ -266,7 +201,7 @@ const TodoApp = () => {
                       Add a new task to your todo list. Fill in the details below.
                     </DialogDescription>
                   </DialogHeader>
-                  
+
                   <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
@@ -274,14 +209,14 @@ const TodoApp = () => {
                         <Input
                           id="title"
                           value={formData.title}
-                          onChange={(e) => setFormData({...formData, title: e.target.value})}
+                          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                           placeholder="Enter todo title"
                           required
                         />
                       </div>
                       <div>
                         <Label htmlFor="category">Category</Label>
-                        <Select value={formData.category} onValueChange={(value) => setFormData({...formData, category: value})}>
+                        <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
                           <SelectTrigger>
                             <SelectValue placeholder="Select category" />
                           </SelectTrigger>
@@ -295,22 +230,22 @@ const TodoApp = () => {
                         </Select>
                       </div>
                     </div>
-                    
+
                     <div>
                       <Label htmlFor="description">Description</Label>
                       <Textarea
                         id="description"
                         value={formData.description}
-                        onChange={(e) => setFormData({...formData, description: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                         placeholder="Enter todo description"
                         rows={3}
                       />
                     </div>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="priority">Priority</Label>
-                        <Select value={formData.priority} onValueChange={(value) => setFormData({...formData, priority: value})}>
+                        <Select value={formData.priority} onValueChange={(value) => setFormData({ ...formData, priority: value })}>
                           <SelectTrigger>
                             <SelectValue placeholder="Select priority" />
                           </SelectTrigger>
@@ -327,16 +262,16 @@ const TodoApp = () => {
                           id="dueDate"
                           type="date"
                           value={formData.dueDate}
-                          onChange={(e) => setFormData({...formData, dueDate: e.target.value})}
+                          onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
                         />
                       </div>
                     </div>
-                    
+
                     <DialogFooter>
-                      <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
+                      <Button type="button" variant="outline" onClick={() => setDialogOpen(false)} className="rounded-3xl">
                         Cancel
                       </Button>
-                      <Button type="submit">
+                      <Button type="submit" className="rounded-3xl">
                         <Plus className="w-4 h-4 mr-2" />
                         Create Todo
                       </Button>
@@ -357,69 +292,7 @@ const TodoApp = () => {
           </div>
         </CardHeader>
 
-        {/* Filters */}
-        {showFilters && (
-          <CardContent className="p-4 sm:p-6 pt-0">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div>
-                <Label>Status</Label>
-                <Select value={filters.status} onValueChange={(value) => updateFilter('status', value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="All statuses" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">All</SelectItem>
-                    <SelectItem value="completed">Completed</SelectItem>
-                    <SelectItem value="pending">Pending</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div>
-                <Label>Category</Label>
-                <Select value={filters.category} onValueChange={(value) => updateFilter('category', value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="All categories" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">All</SelectItem>
-                    <SelectItem value="work">Work</SelectItem>
-                    <SelectItem value="personal">Personal</SelectItem>
-                    <SelectItem value="shopping">Shopping</SelectItem>
-                    <SelectItem value="health">Health</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div>
-                <Label>Priority</Label>
-                <Select value={filters.priority} onValueChange={(value) => updateFilter('priority', value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="All priorities" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">All</SelectItem>
-                    <SelectItem value="high">High</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="low">Low</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div>
-                <Label>Search</Label>
-                <Input
-                  value={filters.search}
-                  onChange={(e) => updateFilter('search', e.target.value)}
-                  placeholder="Search todos..."
-                />
-              </div>
-            </div>
-          </CardContent>
-        )}
-
-        {/* Content based on view mode */}
+        {/* Content */}
         <CardContent className="p-4 sm:p-6 pt-0">
           {loading ? (
             <div className="space-y-4">
@@ -440,86 +313,97 @@ const TodoApp = () => {
               <p className="text-gray-500 text-base sm:text-lg">No todos found</p>
               <p className="text-gray-400 text-xs sm:text-sm mt-2">Create your first todo to get started</p>
             </div>
-          ) : viewMode === 'table' ? (
+          ) : (
             <>
-              <div className="rounded-md border">
+              {/* Desktop Table View */}
+              <div className="hidden md:block rounded-lg border border-gray-200 overflow-hidden">
                 <Table>
                   <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-12">Status</TableHead>
-                      <TableHead>Title</TableHead>
-                      <TableHead>Category</TableHead>
-                      <TableHead>Priority</TableHead>
-                      <TableHead>Due Date</TableHead>
-                      <TableHead className="w-24">Actions</TableHead>
+                    <TableRow className="bg-gray-50 border-b border-gray-200">
+                      <TableHead className="w-16 font-semibold text-gray-700">S.NO</TableHead>
+                      <TableHead className="w-12 font-semibold text-gray-700">Status</TableHead>
+                      <TableHead className="font-semibold text-gray-700">Title</TableHead>
+                      <TableHead className="font-semibold text-gray-700">Category</TableHead>
+                      <TableHead className="font-semibold text-gray-700">Priority</TableHead>
+                      <TableHead className="font-semibold text-gray-700">Created Date</TableHead>
+                      <TableHead className="font-semibold text-gray-700">Due Date</TableHead>
+                      <TableHead className="w-24 font-semibold text-gray-700">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {todos.map((todo) => (
-                      <TableRow 
+                    {todos.map((todo, index) => (
+                      <TableRow
                         key={todo._id}
-                        className={todo.completed ? 'bg-gray-50' : ''}
+                        className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-indigo-50/50 transition-colors border-b border-gray-100 last:border-0`}
                       >
+                        <TableCell className="font-medium text-gray-700">
+                          {startIndex + index + 1}
+                        </TableCell>
                         <TableCell>
                           <Checkbox
                             checked={todo.completed}
                             onCheckedChange={() => handleToggle(todo._id)}
-                            className="data-[state=checked]:bg-black data-[state=checked]:border-black"
+                            className="data-[state=checked]:bg-indigo-600 data-[state=checked]:border-indigo-600"
                           />
                         </TableCell>
                         <TableCell>
                           <div>
-                            <h3 className={`font-medium ${todo.completed ? 'line-through text-gray-500' : 'text-black'}`}>
+                            <h3 className={`font-medium ${todo.completed ? 'line-through text-gray-500' : 'text-gray-900'}`}>
                               {todo.title}
                             </h3>
                             {todo.description && (
-                              <p className={`text-sm mt-1 ${todo.completed ? 'text-gray-400' : 'text-gray-600'}`}>
+                              <p className={`text-xs mt-1 ${todo.completed ? 'text-gray-400' : 'text-gray-500'}`}>
                                 {todo.description}
                               </p>
                             )}
                           </div>
                         </TableCell>
                         <TableCell>
-                          <span className={`px-2 py-1 text-xs rounded-full ${getCategoryColor(todo.category)}`}>
+                          <span className={`px-3 py-1 text-xs font-medium rounded-full ${getCategoryColor(todo.category)}`}>
                             {todo.category}
                           </span>
                         </TableCell>
                         <TableCell>
-                          <span className={`px-2 py-1 text-xs rounded-full border ${getPriorityColor(todo.priority)}`}>
+                          <span className={`px-3 py-1 text-xs font-medium rounded-full border ${getPriorityColor(todo.priority)}`}>
                             <Flag className="w-3 h-3 inline mr-1" />
                             {todo.priority}
                           </span>
                         </TableCell>
                         <TableCell>
+                          <span className="text-sm text-gray-600 flex items-center">
+                            <Calendar className="w-3.5 h-3.5 mr-1.5 text-gray-400" />
+                            {new Date(todo.createdAt).toLocaleDateString()}
+                          </span>
+                        </TableCell>
+                        <TableCell>
                           {todo.dueDate ? (
                             <span className="text-sm text-gray-600 flex items-center">
-                              <Calendar className="w-3 h-3 mr-1" />
+                              <Calendar className="w-3.5 h-3.5 mr-1.5 text-gray-400" />
                               {new Date(todo.dueDate).toLocaleDateString()}
                             </span>
                           ) : (
-                            <span className="text-sm text-gray-400">No due date</span>
+                            <span className="text-sm text-gray-400">-</span>
                           )}
                         </TableCell>
                         <TableCell>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" className="h-8 w-8 p-0">
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem onClick={() => setEditingId(todo._id)}>
-                                <Edit3 className="w-4 h-4 mr-2" />
-                                Edit
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleDelete(todo._id)} className="text-red-600">
-                                <Trash2 className="w-4 h-4 mr-2" />
-                                Delete
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0 hover:bg-indigo-100 rounded-lg"
+                              onClick={() => setEditingId(todo._id)}
+                            >
+                              <Edit3 className="h-4 w-4 text-gray-600" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0 hover:bg-red-100 rounded-lg"
+                              onClick={() => handleDelete(todo._id)}
+                            >
+                              <Trash2 className="h-4 w-4 text-red-600" />
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -527,164 +411,26 @@ const TodoApp = () => {
                 </Table>
               </div>
 
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="mt-6">
-                  <Pagination>
-                    <PaginationContent>
-                      <PaginationItem>
-                        <PaginationPrevious 
-                          onClick={() => handlePageChange(filters.page - 1)}
-                          className={filters.page <= 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                        />
-                      </PaginationItem>
-                      
-                      {[...Array(totalPages)].map((_, i) => {
-                        const page = i + 1;
-                        if (page === 1 || page === totalPages || (page >= filters.page - 1 && page <= filters.page + 1)) {
-                          return (
-                            <PaginationItem key={page}>
-                              <PaginationLink
-                                onClick={() => handlePageChange(page)}
-                                isActive={page === filters.page}
-                                className="cursor-pointer"
-                              >
-                                {page}
-                              </PaginationLink>
-                            </PaginationItem>
-                          );
-                        } else if (page === filters.page - 2 || page === filters.page + 2) {
-                          return (
-                            <PaginationItem key={page}>
-                              <PaginationEllipsis />
-                            </PaginationItem>
-                          );
-                        }
-                        return null;
-                      })}
-                      
-                      <PaginationItem>
-                        <PaginationNext 
-                          onClick={() => handlePageChange(filters.page + 1)}
-                          className={filters.page >= totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                        />
-                      </PaginationItem>
-                    </PaginationContent>
-                  </Pagination>
-                </div>
-              )}
-            </>
-          ) : viewMode === 'card' ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {todos.map((todo) => (
-                <Card key={todo._id} className={todo.completed ? 'bg-gray-50' : ''}>
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center space-x-2">
-                        <Checkbox
-                          checked={todo.completed}
-                          onCheckedChange={() => handleToggle(todo._id)}
-                          className="data-[state=checked]:bg-black data-[state=checked]:border-black"
-                        />
-                        <CardTitle className={`text-sm ${todo.completed ? 'line-through text-gray-500' : ''}`}>
-                          {todo.title}
-                        </CardTitle>
-                      </div>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => setEditingId(todo._id)}>
-                            <Edit3 className="w-4 h-4 mr-2" />
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleDelete(todo._id)} className="text-red-600">
-                            <Trash2 className="w-4 h-4 mr-2" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    {todo.description && (
-                      <p className={`text-sm mb-3 ${todo.completed ? 'text-gray-400' : 'text-gray-600'}`}>
-                        {todo.description}
-                      </p>
-                    )}
-                    <div className="flex items-center space-x-2 mb-3">
-                      <span className={`px-2 py-1 text-xs rounded-full ${getCategoryColor(todo.category)}`}>
-                        {todo.category}
-                      </span>
-                      <span className={`px-2 py-1 text-xs rounded-full border ${getPriorityColor(todo.priority)}`}>
-                        <Flag className="w-3 h-3 inline mr-1" />
-                        {todo.priority}
-                      </span>
-                    </div>
-                    {todo.dueDate && (
-                      <div className="flex items-center text-sm text-gray-500">
-                        <Calendar className="w-3 h-3 mr-1" />
-                        {new Date(todo.dueDate).toLocaleDateString()}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            // Calendar View
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold">Calendar View</h3>
-                <Button variant="outline" onClick={() => setShowCalendar(!showCalendar)}>
-                  <Calendar className="w-4 h-4 mr-2" />
-                  {showCalendar ? 'Hide Calendar' : 'Show Calendar'}
-                </Button>
-              </div>
-              
-              {showCalendar && (
-                <Card>
-                  <CardContent className="p-4">
-                    <CalendarComponent
-                      mode="single"
-                      selected={selectedDate}
-                      onSelect={setSelectedDate}
-                      className="rounded-md border"
-                    />
-                  </CardContent>
-                </Card>
-              )}
-              
-              <Separator />
-              
-              <div className="space-y-2">
-                {todos.map((todo) => (
+              {/* Mobile Card View */}
+              <div className="md:hidden space-y-4">
+                {todos.map((todo, index) => (
                   <Card key={todo._id} className={todo.completed ? 'bg-gray-50' : ''}>
                     <CardContent className="p-4">
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-center space-x-3">
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-center space-x-3 flex-1">
+                          <span className="text-sm font-semibold text-gray-600">#{startIndex + index + 1}</span>
                           <Checkbox
                             checked={todo.completed}
                             onCheckedChange={() => handleToggle(todo._id)}
-                            className="data-[state=checked]:bg-black data-[state=checked]:border-black"
+                            className="data-[state=checked]:bg-indigo-600 data-[state=checked]:border-indigo-600"
                           />
-                          <div>
-                            <h3 className={`font-medium ${todo.completed ? 'line-through text-gray-500' : 'text-black'}`}>
-                              {todo.title}
-                            </h3>
-                            {todo.description && (
-                              <p className={`text-sm mt-1 ${todo.completed ? 'text-gray-400' : 'text-gray-600'}`}>
-                                {todo.description}
-                              </p>
-                            )}
-                          </div>
+                          <h3 className={`font-medium flex-1 ${todo.completed ? 'line-through text-gray-500' : 'text-indigo-600'}`}>
+                            {todo.title}
+                          </h3>
                         </div>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
+                            <Button variant="ghost" className="h-8 w-8 p-0 rounded-3xl">
                               <MoreHorizontal className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
@@ -700,11 +446,87 @@ const TodoApp = () => {
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </div>
+
+                      {todo.description && (
+                        <p className={`text-sm mb-3 ${todo.completed ? 'text-gray-400' : 'text-gray-600'}`}>
+                          {todo.description}
+                        </p>
+                      )}
+
+                      <div className="flex items-center flex-wrap gap-2 mb-3">
+                        <span className={`px-2 py-1 text-xs rounded-full ${getCategoryColor(todo.category)}`}>
+                          {todo.category}
+                        </span>
+                        <span className={`px-2 py-1 text-xs rounded-full border ${getPriorityColor(todo.priority)}`}>
+                          <Flag className="w-3 h-3 inline mr-1" />
+                          {todo.priority}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-between text-xs text-gray-500">
+                        <div className="flex items-center">
+                          <Calendar className="w-3 h-3 mr-1" />
+                          <span>Created: {new Date(todo.createdAt).toLocaleDateString()}</span>
+                        </div>
+                        {todo.dueDate && (
+                          <div className="flex items-center">
+                            <Calendar className="w-3 h-3 mr-1" />
+                            <span>Due: {new Date(todo.dueDate).toLocaleDateString()}</span>
+                          </div>
+                        )}
+                      </div>
                     </CardContent>
                   </Card>
                 ))}
               </div>
-            </div>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="mt-6">
+                  <Pagination>
+                    <PaginationContent>
+                      <PaginationItem>
+                        <PaginationPrevious
+                          onClick={() => handlePageChange(filters.page - 1)}
+                          className={`rounded-3xl ${filters.page <= 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}`}
+                        />
+                      </PaginationItem>
+
+                      {[...Array(totalPages)].map((_, i) => {
+                        const page = i + 1;
+                        if (page === 1 || page === totalPages || (page >= filters.page - 1 && page <= filters.page + 1)) {
+                          return (
+                            <PaginationItem key={page}>
+                              <PaginationLink
+                                onClick={() => handlePageChange(page)}
+                                isActive={page === filters.page}
+                                className="cursor-pointer rounded-3xl"
+                              >
+                                {page}
+                              </PaginationLink>
+                            </PaginationItem>
+                          );
+                        } else if (page === filters.page - 2 || page === filters.page + 2) {
+                          return (
+                            <PaginationItem key={page}>
+                              <PaginationEllipsis />
+                            </PaginationItem>
+                          );
+                        }
+                        return null;
+                      })}
+
+                      <PaginationItem>
+                        <PaginationNext
+                          onClick={() => handlePageChange(filters.page + 1)}
+                          className={`rounded-3xl ${filters.page >= totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}`}
+                        />
+                      </PaginationItem>
+                    </PaginationContent>
+                  </Pagination>
+                </div>
+              )}
+            </>
           )}
         </CardContent>
       </Card>

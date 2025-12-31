@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import { User, Mail, Lock, Eye, EyeOff, UserPlus, LogIn, Sparkles, IndianRupee, CheckCircle, Phone, MapPin, KeyRound } from 'lucide-react';
+import { User, Mail, Lock, Eye, EyeOff, UserPlus, LogIn, Sparkles, Phone, MapPin, KeyRound, X } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+import { Card, CardContent } from './ui/card';
 import { registerUser, loginWithPassword, sendOTP, verifyOTP, storeUserData } from '../services/authService';
 import toast, { Toaster } from 'react-hot-toast';
 
 const Auth = ({ onLogin }) => {
   const [isLogin, setIsLogin] = useState(true);
-  const [isOtpLogin, setIsOtpLogin] = useState(true); // Default to OTP login
+  const [isOtpLogin, setIsOtpLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
@@ -25,57 +25,55 @@ const Auth = ({ onLogin }) => {
   });
   const [errors, setErrors] = useState({});
 
-  // API calls now handled by authService
-
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!isLogin) {
       if (!formData.name.trim()) {
         newErrors.name = 'Name is required';
       }
-      
+
       if (!formData.city.trim()) {
         newErrors.city = 'City is required';
       }
-      
+
       if (formData.mobile && !/^[6-9]\d{9}$/.test(formData.mobile)) {
         newErrors.mobile = 'Mobile number must be 10 digits starting with 6-9';
       }
-      
+
       if (!formData.password) {
         newErrors.password = 'Password is required';
       } else if (formData.password.length < 6) {
         newErrors.password = 'Password must be at least 6 characters';
       }
-      
+
       if (!formData.confirmPassword) {
         newErrors.confirmPassword = 'Confirm password is required';
       } else if (formData.password !== formData.confirmPassword) {
         newErrors.confirmPassword = 'Passwords do not match';
       }
     }
-    
+
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Email is invalid';
     }
-    
+
     if (isLogin && !isOtpLogin && !formData.password) {
       newErrors.password = 'Password is required';
     }
-    
+
     if (isLogin && isOtpLogin && !otpSent && !formData.email.trim()) {
       newErrors.email = 'Email is required for OTP login';
     } else if (isLogin && isOtpLogin && !otpSent && formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Email is invalid';
     }
-    
+
     if (isLogin && isOtpLogin && otpSent && otp.join('').length !== 6) {
       newErrors.otp = 'Please enter 6-digit OTP';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -84,31 +82,25 @@ const Auth = ({ onLogin }) => {
     e.preventDefault();
     if (validateForm()) {
       setIsLoading(true);
-      
+
       try {
         if (isLogin && isOtpLogin && !otpSent) {
-          // Send OTP
           await handleSendOTP();
           return;
         }
-        
+
         if (isLogin && isOtpLogin && otpSent) {
-          // Verify OTP
           await handleVerifyOTP();
           return;
         }
-        
+
         if (!isLogin) {
-          // Register user
           await handleRegisterUser();
         } else {
-          // Login user
           await handleLoginUser();
         }
       } catch (error) {
         console.error('Auth error:', error);
-        
-        // Show toast notification for errors (no inline error display)
         toast.error(error.message || 'Something went wrong', {
           duration: 4000,
           position: 'top-center',
@@ -135,10 +127,6 @@ const Auth = ({ onLogin }) => {
         confirmPassword: formData.confirmPassword
       });
 
-      // Registration successful
-      console.log('Registration successful:', data);
-      
-      // Show success toast
       toast.success('Account created successfully!', {
         duration: 3000,
         position: 'top-center',
@@ -148,8 +136,7 @@ const Auth = ({ onLogin }) => {
           border: '1px solid #A7F3D0',
         },
       });
-      
-      // Call onLogin with user data
+
       const userData = {
         name: data.user.name,
         email: data.user.email,
@@ -159,11 +146,9 @@ const Auth = ({ onLogin }) => {
         role: data.user.role,
         joinDate: new Date().toISOString()
       };
-      
-      // Store user data for persistence
+
       storeUserData(userData);
       onLogin(userData);
-      
     } catch (error) {
       throw error;
     }
@@ -176,10 +161,6 @@ const Auth = ({ onLogin }) => {
         password: formData.password
       });
 
-      // Login successful
-      console.log('Login successful:', data);
-      
-      // Show success toast
       toast.success('Welcome back!', {
         duration: 3000,
         position: 'top-center',
@@ -189,8 +170,7 @@ const Auth = ({ onLogin }) => {
           border: '1px solid #A7F3D0',
         },
       });
-      
-      // Call onLogin with user data
+
       const userData = {
         name: data.user.name,
         email: data.user.email,
@@ -200,11 +180,9 @@ const Auth = ({ onLogin }) => {
         role: data.user.role,
         joinDate: new Date().toISOString()
       };
-      
-      // Store user data for persistence
+
       storeUserData(userData);
       onLogin(userData);
-      
     } catch (error) {
       throw error;
     }
@@ -213,12 +191,8 @@ const Auth = ({ onLogin }) => {
   const handleSendOTP = async () => {
     try {
       const data = await sendOTP(formData.email);
-
-      // OTP sent successfully
-      console.log('OTP sent successfully:', data);
       setOtpSent(true);
-      
-      // Show success toast
+
       toast.success('OTP sent to your email!', {
         duration: 3000,
         position: 'top-center',
@@ -228,7 +202,6 @@ const Auth = ({ onLogin }) => {
           border: '1px solid #A7F3D0',
         },
       });
-      
     } catch (error) {
       throw error;
     }
@@ -247,13 +220,12 @@ const Auth = ({ onLogin }) => {
       const newOtp = [...otp];
       newOtp[index] = value;
       setOtp(newOtp);
-      
-      // Auto-focus next input
+
       if (value && index < 5) {
         const nextInput = document.getElementById(`otp-${index + 1}`);
         if (nextInput) nextInput.focus();
       }
-      
+
       if (errors.otp) {
         setErrors(prev => ({ ...prev, otp: '' }));
       }
@@ -273,8 +245,7 @@ const Auth = ({ onLogin }) => {
       await handleSendOTP();
       setOtp(['', '', '', '', '', '']);
       setErrors(prev => ({ ...prev, otp: '' }));
-      
-      // Show success toast for OTP sent
+
       toast.success('OTP sent successfully!', {
         duration: 3000,
         position: 'top-center',
@@ -286,8 +257,6 @@ const Auth = ({ onLogin }) => {
       });
     } catch (error) {
       console.error('Resend OTP error:', error);
-      
-      // Show error toast (no inline error display)
       toast.error(error.message || 'Failed to resend OTP', {
         duration: 4000,
         position: 'top-center',
@@ -307,10 +276,6 @@ const Auth = ({ onLogin }) => {
       const otpString = otp.join('');
       const data = await verifyOTP(formData.email, otpString);
 
-      // OTP verification successful
-      console.log('OTP verification successful:', data);
-      
-      // Show success toast
       toast.success('OTP verified successfully!', {
         duration: 3000,
         position: 'top-center',
@@ -320,8 +285,7 @@ const Auth = ({ onLogin }) => {
           border: '1px solid #A7F3D0',
         },
       });
-      
-      // Call onLogin with user data
+
       const userData = {
         name: data.user.name,
         email: data.user.email,
@@ -331,54 +295,32 @@ const Auth = ({ onLogin }) => {
         role: data.user.role,
         joinDate: new Date().toISOString()
       };
-      
-      // Store user data for persistence
+
       storeUserData(userData);
       onLogin(userData);
-      
     } catch (error) {
       throw error;
     }
   };
 
-  const features = [
-    {
-      icon: CheckCircle,
-      title: 'Todo Management',
-      description: 'Organize tasks efficiently'
-    },
-    {
-      icon: IndianRupee,
-      title: 'Expense Tracking',
-      description: 'Manage your budget'
-    },
-    {
-      icon: Sparkles,
-      title: 'AI Assistant',
-      description: 'Get smart help'
-    }
-  ];
-
   return (
     <>
       <Toaster />
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-start lg:items-center justify-center p-4 overflow-y-auto">
-      <div className="w-full max-w-4xl grid grid-cols-1 lg:grid-cols-2 gap-8 lg:items-center py-8 lg:py-0">
-        {/* Left Side - Auth Form */}
-        <div className="space-y-6">
+      <div className="min-h-screen bg-purple-50 flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
           {/* Logo and Header */}
-          <div className="text-center lg:text-left space-y-4">
-            <div className="flex items-center justify-center lg:justify-start space-x-3">
-              <div className="w-12 h-12 bg-black rounded-xl flex items-center justify-center shadow-lg">
-                <Sparkles className="w-6 h-6 text-white" />
+          <div className="text-center space-y-4 mb-8">
+            <div className="flex items-center justify-center space-x-3">
+              <div className="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-lg">
+                <Sparkles className="w-7 h-7 text-white" />
               </div>
-              <div>
-                <h1 className="text-2xl font-bold text-black">MultiApp</h1>
+              <div className="text-left">
+                <h1 className="text-2xl font-bold text-indigo-600">Task Manager</h1>
                 <p className="text-sm text-gray-600">Productivity Suite</p>
               </div>
             </div>
             <div>
-              <h2 className="text-3xl font-bold text-black">
+              <h2 className="text-3xl font-bold text-indigo-600">
                 {isLogin ? 'Welcome back' : 'Create your account'}
               </h2>
               <p className="text-gray-600 mt-2">
@@ -389,7 +331,7 @@ const Auth = ({ onLogin }) => {
 
           {/* Login Method Toggle */}
           {isLogin && (
-            <div className="flex items-center justify-center space-x-4 bg-gray-50 p-2 rounded-lg">
+            <div className="flex items-center justify-center space-x-2 bg-white p-1.5 rounded-full shadow-md mb-6">
               <Button
                 variant={isOtpLogin ? "default" : "ghost"}
                 size="sm"
@@ -399,7 +341,7 @@ const Auth = ({ onLogin }) => {
                   setOtp(['', '', '', '', '', '']);
                   setErrors({});
                 }}
-                className={isOtpLogin ? "bg-black text-white" : "text-gray-600"}
+                className={`rounded-full ${isOtpLogin ? "bg-indigo-500 text-white hover:bg-indigo-600" : "text-gray-600 hover:bg-gray-100"}`}
               >
                 <KeyRound className="w-4 h-4 mr-2" />
                 OTP Login
@@ -412,7 +354,7 @@ const Auth = ({ onLogin }) => {
                   setOtpSent(false);
                   setErrors({});
                 }}
-                className={!isOtpLogin ? "bg-black text-white" : "text-gray-600"}
+                className={`rounded-full ${!isOtpLogin ? "bg-indigo-500 text-white hover:bg-indigo-600" : "text-gray-600 hover:bg-gray-100"}`}
               >
                 <Lock className="w-4 h-4 mr-2" />
                 Password Login
@@ -421,26 +363,25 @@ const Auth = ({ onLogin }) => {
           )}
 
           {/* Auth Form */}
-          <Card className="shadow-lg border-0">
-            <CardContent className="p-6">
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {/* General Error Display - Removed to show only toast notifications */}
+          <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
+            <CardContent className="p-6 sm:p-8">
+              <form onSubmit={handleSubmit} className="space-y-5">
                 {/* Signup Fields */}
                 {!isLogin && (
                   <>
                     <div className="space-y-2">
-                      <Label htmlFor="name" className="text-sm font-medium text-black">
+                      <Label htmlFor="name" className="text-sm font-medium text-gray-700">
                         Full Name <span className="text-red-500">*</span>
                       </Label>
                       <div className="relative">
-                        <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-indigo-400" />
                         <Input
                           id="name"
                           type="text"
                           name="name"
                           value={formData.name}
                           onChange={handleInputChange}
-                          className={`pl-10 ${errors.name ? 'border-red-500 focus:border-red-500' : ''}`}
+                          className={`pl-11 h-12 border-gray-200 focus:border-indigo-500 focus:ring-indigo-500 ${errors.name ? 'border-red-500' : ''}`}
                           placeholder="Enter your full name"
                         />
                       </div>
@@ -448,18 +389,18 @@ const Auth = ({ onLogin }) => {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="city" className="text-sm font-medium text-black">
+                      <Label htmlFor="city" className="text-sm font-medium text-gray-700">
                         City <span className="text-red-500">*</span>
                       </Label>
                       <div className="relative">
-                        <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-indigo-400" />
                         <Input
                           id="city"
                           type="text"
                           name="city"
                           value={formData.city}
                           onChange={handleInputChange}
-                          className={`pl-10 ${errors.city ? 'border-red-500 focus:border-red-500' : ''}`}
+                          className={`pl-11 h-12 border-gray-200 focus:border-indigo-500 focus:ring-indigo-500 ${errors.city ? 'border-red-500' : ''}`}
                           placeholder="Enter your city"
                         />
                       </div>
@@ -467,18 +408,18 @@ const Auth = ({ onLogin }) => {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="mobile" className="text-sm font-medium text-black">
+                      <Label htmlFor="mobile" className="text-sm font-medium text-gray-700">
                         Mobile Number
                       </Label>
                       <div className="relative">
-                        <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-indigo-400" />
                         <Input
                           id="mobile"
                           type="tel"
                           name="mobile"
                           value={formData.mobile}
                           onChange={handleInputChange}
-                          className={`pl-10 ${errors.mobile ? 'border-red-500 focus:border-red-500' : ''}`}
+                          className={`pl-11 h-12 border-gray-200 focus:border-indigo-500 focus:ring-indigo-500 ${errors.mobile ? 'border-red-500' : ''}`}
                           placeholder="Enter mobile number (optional)"
                           maxLength="10"
                         />
@@ -488,45 +429,39 @@ const Auth = ({ onLogin }) => {
                   </>
                 )}
 
-                {/* Email Field - Only show for signup or password login */}
-                {(!isLogin || (isLogin && !isOtpLogin)) && (
+                {/* Email Field */}
+                {(!isLogin || (isLogin && !isOtpLogin) || (isLogin && isOtpLogin && !otpSent)) && (
                   <div className="space-y-2">
-                    <Label htmlFor="email" className="text-sm font-medium text-black">
+                    <Label htmlFor="email" className="text-sm font-medium text-gray-700">
                       Email Address <span className="text-red-500">*</span>
                     </Label>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-indigo-400" />
                       <Input
                         id="email"
                         type="email"
                         name="email"
                         value={formData.email}
                         onChange={handleInputChange}
-                        className={`pl-10 ${errors.email ? 'border-red-500 focus:border-red-500' : ''}`}
-                        placeholder="Enter your email"
+                        className={`pl-11 pr-11 h-12 border-gray-200 focus:border-indigo-500 focus:ring-indigo-500 ${errors.email ? 'border-red-500' : ''}`}
+                        placeholder={isLogin && isOtpLogin ? "Enter email for OTP" : "Enter your email"}
                       />
-                    </div>
-                    {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
-                  </div>
-                )}
-
-                {/* Email Field for OTP Login */}
-                {isLogin && isOtpLogin && !otpSent && (
-                  <div className="space-y-2">
-                    <Label htmlFor="email" className="text-sm font-medium text-black">
-                      Email Address <span className="text-red-500">*</span>
-                    </Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                      <Input
-                        id="email"
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        className={`pl-10 ${errors.email ? 'border-red-500 focus:border-red-500' : ''}`}
-                        placeholder="Enter email for OTP"
-                      />
+                      {formData.email && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => {
+                            setFormData(prev => ({ ...prev, email: '' }));
+                            if (errors.email) {
+                              setErrors(prev => ({ ...prev, email: '' }));
+                            }
+                          }}
+                          className="absolute right-1 top-1/2 transform -translate-y-1/2 h-10 w-10 hover:bg-indigo-50"
+                        >
+                          <X className="w-5 h-5 text-gray-400" />
+                        </Button>
+                      )}
                     </div>
                     {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
                   </div>
@@ -534,11 +469,11 @@ const Auth = ({ onLogin }) => {
 
                 {/* OTP Input */}
                 {isLogin && isOtpLogin && otpSent && (
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium text-black">
+                  <div className="space-y-3">
+                    <Label className="text-sm font-medium text-gray-700">
                       Enter OTP <span className="text-red-500">*</span>
                     </Label>
-                    <div className="flex space-x-2 justify-center">
+                    <div className="flex gap-2 justify-between">
                       {otp.map((digit, index) => (
                         <Input
                           key={index}
@@ -547,7 +482,7 @@ const Auth = ({ onLogin }) => {
                           value={digit}
                           onChange={(e) => handleOtpChange(index, e.target.value)}
                           onKeyDown={(e) => handleKeyDown(index, e)}
-                          className="w-12 h-12 text-center text-lg font-semibold"
+                          className="w-12 h-14 text-center text-xl font-semibold border-gray-200 focus:border-indigo-500 focus:ring-indigo-500"
                           maxLength="1"
                         />
                       ))}
@@ -559,7 +494,7 @@ const Auth = ({ onLogin }) => {
                         variant="link"
                         onClick={resendOtp}
                         disabled={isLoading}
-                        className="text-sm text-gray-600 hover:text-black"
+                        className="text-sm text-indigo-600 hover:text-indigo-700"
                       >
                         {isLoading ? 'Sending...' : 'Resend OTP'}
                       </Button>
@@ -571,18 +506,18 @@ const Auth = ({ onLogin }) => {
                 {(!isLogin || (isLogin && !isOtpLogin)) && (
                   <>
                     <div className="space-y-2">
-                      <Label htmlFor="password" className="text-sm font-medium text-black">
+                      <Label htmlFor="password" className="text-sm font-medium text-gray-700">
                         Password <span className="text-red-500">*</span>
                       </Label>
                       <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-indigo-400" />
                         <Input
                           id="password"
                           type={showPassword ? 'text' : 'password'}
                           name="password"
                           value={formData.password}
                           onChange={handleInputChange}
-                          className={`pl-10 pr-10 ${errors.password ? 'border-red-500 focus:border-red-500' : ''}`}
+                          className={`pl-11 pr-11 h-12 border-gray-200 focus:border-indigo-500 focus:ring-indigo-500 ${errors.password ? 'border-red-500' : ''}`}
                           placeholder="Enter your password"
                         />
                         <Button
@@ -590,9 +525,9 @@ const Auth = ({ onLogin }) => {
                           variant="ghost"
                           size="icon"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8 hover:bg-gray-100"
+                          className="absolute right-1 top-1/2 transform -translate-y-1/2 h-10 w-10 hover:bg-indigo-50"
                         >
-                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          {showPassword ? <EyeOff className="w-5 h-5 text-gray-400" /> : <Eye className="w-5 h-5 text-gray-400" />}
                         </Button>
                       </div>
                       {errors.password && <p className="text-sm text-red-500">{errors.password}</p>}
@@ -600,18 +535,18 @@ const Auth = ({ onLogin }) => {
 
                     {!isLogin && (
                       <div className="space-y-2">
-                        <Label htmlFor="confirmPassword" className="text-sm font-medium text-black">
+                        <Label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">
                           Confirm Password <span className="text-red-500">*</span>
                         </Label>
                         <div className="relative">
-                          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-indigo-400" />
                           <Input
                             id="confirmPassword"
                             type={showConfirmPassword ? 'text' : 'password'}
                             name="confirmPassword"
                             value={formData.confirmPassword}
                             onChange={handleInputChange}
-                            className={`pl-10 pr-10 ${errors.confirmPassword ? 'border-red-500 focus:border-red-500' : ''}`}
+                            className={`pl-11 pr-11 h-12 border-gray-200 focus:border-indigo-500 focus:ring-indigo-500 ${errors.confirmPassword ? 'border-red-500' : ''}`}
                             placeholder="Confirm your password"
                           />
                           <Button
@@ -619,9 +554,9 @@ const Auth = ({ onLogin }) => {
                             variant="ghost"
                             size="icon"
                             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                            className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8 hover:bg-gray-100"
+                            className="absolute right-1 top-1/2 transform -translate-y-1/2 h-10 w-10 hover:bg-indigo-50"
                           >
-                            {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                            {showConfirmPassword ? <EyeOff className="w-5 h-5 text-gray-400" /> : <Eye className="w-5 h-5 text-gray-400" />}
                           </Button>
                         </div>
                         {errors.confirmPassword && <p className="text-sm text-red-500">{errors.confirmPassword}</p>}
@@ -630,38 +565,34 @@ const Auth = ({ onLogin }) => {
                   </>
                 )}
 
-                <Button 
-                  type="submit" 
-                  className="w-full h-12 text-base font-medium bg-black hover:bg-gray-800" 
+                <Button
+                  type="submit"
+                  className="w-full h-12 text-base font-medium bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
                   size="lg"
                   disabled={isLoading}
                 >
                   {isLoading ? (
                     <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      {isLogin ? (
-                        isOtpLogin && !otpSent ? 'Sending OTP...' : 'Signing In...'
-                      ) : (
-                        'Creating Account...'
-                      )}
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                      {isLogin ? (isOtpLogin && !otpSent ? 'Sending OTP...' : 'Signing In...') : 'Creating Account...'}
                     </>
                   ) : (
                     <>
                       {isLogin ? (
                         isOtpLogin && !otpSent ? (
                           <>
-                            <KeyRound className="w-4 h-4 mr-2" />
+                            <KeyRound className="w-5 h-5 mr-2" />
                             Send OTP
                           </>
                         ) : (
                           <>
-                            <LogIn className="w-4 h-4 mr-2" />
+                            <LogIn className="w-5 h-5 mr-2" />
                             Sign In
                           </>
                         )
                       ) : (
                         <>
-                          <UserPlus className="w-4 h-4 mr-2" />
+                          <UserPlus className="w-5 h-5 mr-2" />
                           Create Account
                         </>
                       )}
@@ -684,7 +615,7 @@ const Auth = ({ onLogin }) => {
                       setFormData({ name: '', email: '', city: '', mobile: '', password: '', confirmPassword: '' });
                       setIsLoading(false);
                     }}
-                    className="ml-1 p-0 h-auto text-black hover:text-gray-700 font-medium"
+                    className="ml-1 p-0 h-auto text-indigo-600 hover:text-indigo-700 font-semibold"
                   >
                     {isLogin ? 'Sign up' : 'Sign in'}
                   </Button>
@@ -693,78 +624,7 @@ const Auth = ({ onLogin }) => {
             </CardContent>
           </Card>
         </div>
-
-        {/* Right Side - Features Preview */}
-        <div className="hidden lg:block space-y-6">
-          <div className="text-center space-y-4">
-            <h3 className="text-2xl font-bold text-black">Everything you need in one place</h3>
-            <p className="text-gray-600">Manage tasks, track expenses, and get AI assistance all in one powerful app.</p>
-          </div>
-          
-          <div className="grid grid-cols-1 gap-4">
-            {features.map((feature, index) => {
-              const Icon = feature.icon;
-              return (
-                <Card key={index} className="border-0 shadow-md hover:shadow-lg transition-shadow duration-200">
-                  <CardContent className="p-4">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-10 h-10 bg-black rounded-lg flex items-center justify-center">
-                        <Icon className="w-5 h-5 text-white" />
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-black">{feature.title}</h4>
-                        <p className="text-sm text-gray-600">{feature.description}</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-
-          {/* Stats */}
-          <Card className="border-0 shadow-md bg-black text-white">
-            <CardContent className="p-6">
-              <div className="grid grid-cols-3 gap-4 text-center">
-                <div>
-                  <div className="text-2xl font-bold">1K+</div>
-                  <div className="text-sm text-gray-300">Active Users</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold">5K+</div>
-                  <div className="text-sm text-gray-300">Tasks Completed</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold">99%</div>
-                  <div className="text-sm text-gray-300">Satisfaction</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Mobile Features */}
-        <div className="lg:hidden space-y-6">
-          <div className="text-center space-y-4">
-            <h3 className="text-xl font-bold text-black">Key Features</h3>
-            <p className="text-gray-600">Everything you need to stay productive</p>
-          </div>
-          <div className="grid grid-cols-3 gap-3">
-            {features.map((feature, index) => {
-              const Icon = feature.icon;
-              return (
-                <Card key={index} className="text-center p-4 border-0 shadow-sm">
-                  <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center mx-auto mb-2">
-                    <Icon className="w-4 h-4 text-white" />
-                  </div>
-                  <p className="text-xs text-gray-600 font-medium">{feature.title}</p>
-                </Card>
-              );
-            })}
-          </div>
-        </div>
       </div>
-    </div>
     </>
   );
 };

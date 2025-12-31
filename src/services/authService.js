@@ -1,9 +1,9 @@
 
-const API_BASE_URL = 'https://multi-app-backend.vercel.app/api/auth';
-// const API_BASE_URL='http://localhost:5000/api/auth';
+// const API_BASE_URL = 'https://multi-app-backend.vercel.app/api/auth';
+const API_BASE_URL = 'http://localhost:5000/api/auth';
 
 // Cookie management functions for user data only (not JWT tokens)
-const setCookie = (name, value, days = 7) => {  
+const setCookie = (name, value, days = 7) => {
   const expires = new Date();
   expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
   document.cookie = `${name}=${encodeURIComponent(JSON.stringify(value))};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
@@ -36,21 +36,21 @@ const deleteCookie = (name) => {
 // Helper function to handle API responses
 const handleResponse = async (response) => {
   console.log('API response status:', response.status);
-  
+
   const data = await response.json();
   console.log('API response data:', data);
-  
+
   if (!response.ok) {
     throw new Error(data.message || 'API request failed');
   }
-  
+
   return data;
 };
 
 const getAuthHeaders = () => {
   return {
     'Content-Type': 'application/json',
-   
+
   };
 };
 
@@ -95,7 +95,7 @@ export const registerUser = async (userData) => {
   });
 
   const data = await handleResponse(response);
-  
+
   return data;
 };
 
@@ -174,7 +174,7 @@ export const validateToken = async () => {
     });
 
     console.log('Token validation response status:', response.status);
-    
+
     if (!response.ok) {
       const errorData = await response.json();
       console.error('Token validation failed with status:', response.status, errorData);
@@ -183,7 +183,7 @@ export const validateToken = async () => {
 
     const data = await response.json();
     console.log('Token validation successful:', data);
-    
+
     // Update stored user data with fresh data from server
     if (data.user) {
       storeUserData(data.user);
@@ -200,11 +200,11 @@ export const validateToken = async () => {
 // Function to check if user is authenticated (for initial load)
 export const checkAuthStatus = () => {
   const userData = getUserData();
-  
+
   if (userData) {
     return userData;
   }
-  
+
   return null;
 };
 

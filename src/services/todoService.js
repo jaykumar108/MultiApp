@@ -1,15 +1,15 @@
-const API_BASE_URL = 'https://multi-app-backend.vercel.app/api/todos';
+// const API_BASE_URL = 'https://multi-app-backend.vercel.app/api/todos';
 // const API_BASE_URL = '/api/todos';
-// const API_BASE_URL='http://localhost:5000/api/todos';
+const API_BASE_URL = 'http://localhost:5000/api/todos';
 
 // Helper function to handle API responses
 const handleResponse = async (response) => {
   const data = await response.json();
-  
+
   if (!response.ok) {
     throw new Error(data.message || 'API request failed');
   }
-  
+
   return data;
 };
 
@@ -58,7 +58,7 @@ export const createTodo = async (todoData) => {
 // Get todos with filtering and pagination
 export const getTodos = async (filters = {}) => {
   const queryParams = new URLSearchParams();
-  
+
   // Add all filter parameters
   Object.keys(filters).forEach(key => {
     if (filters[key] !== undefined && filters[key] !== null && filters[key] !== '') {
@@ -67,7 +67,7 @@ export const getTodos = async (filters = {}) => {
   });
 
   const url = queryParams.toString() ? `${API_BASE_URL}?${queryParams.toString()}` : API_BASE_URL;
-  
+
   const response = await fetch(url, {
     method: 'GET',
     headers: getAuthHeaders(),
@@ -80,7 +80,7 @@ export const getTodos = async (filters = {}) => {
 // Get todo statistics
 export const getTodoStats = async (filters = {}) => {
   const queryParams = new URLSearchParams();
-  
+
   Object.keys(filters).forEach(key => {
     if (filters[key] !== undefined && filters[key] !== null && filters[key] !== '') {
       queryParams.append(key, filters[key]);
@@ -88,7 +88,7 @@ export const getTodoStats = async (filters = {}) => {
   });
 
   const url = queryParams.toString() ? `${API_BASE_URL}/stats?${queryParams.toString()}` : `${API_BASE_URL}/stats`;
-  
+
   const response = await fetch(url, {
     method: 'GET',
     headers: getAuthHeaders(),

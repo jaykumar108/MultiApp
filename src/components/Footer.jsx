@@ -15,11 +15,11 @@ const Footer = () => {
                 <Sparkles className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-gray-900">MultiApp</h3>
+                <h3 className="text-xl font-bold text-gray-900">Task Manager</h3>
                 <p className="text-sm text-gray-500">Your Productivity Suite</p>
               </div>
             </div>
-           
+
             <div className="flex items-center space-x-2 text-sm text-gray-500">
               <span>By:</span>
               <Heart className="w-4 h-4 text-red-500 fill-current" />
@@ -40,7 +40,7 @@ const Footer = () => {
               <li className="hover:text-gray-900 transition-colors duration-200 cursor-pointer">
                 AI Chat Assistant
               </li>
-             
+
             </ul>
           </div>
 
@@ -74,7 +74,7 @@ const Footer = () => {
         <div className="border-t border-gray-200/50 mt-8 pt-6">
           <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
             <div className="text-sm text-gray-500">
-              © {currentYear} MultiApp. All rights reserved.
+              © {currentYear} Task Manager. All rights reserved.
             </div>
             <div className="flex space-x-6 text-sm text-gray-500">
               <a href="#" className="hover:text-gray-900 transition-colors duration-200">
